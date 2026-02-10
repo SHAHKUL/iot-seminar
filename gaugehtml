@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>IoT Gauge Controller</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card {
+      background: #020617;
+      padding: 25px;
+      border-radius: 14px;
+      width: 320px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0,0,0,0.6);
+    }
+
+    h2 {
+      margin-bottom: 15px;
+    }
+
+    /* Gauge Circle */
+    .gauge {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      border: 10px solid #1e293b;
+      margin: 20px auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 34px;
+      font-weight: bold;
+      color: #22c55e;
+    }
+
+    /* Slider */
+    input[type="range"] {
+      width: 100%;
+      margin-top: 20px;
+      accent-color: #22c55e;
+    }
+
+    .status {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    .online {
+      color: #22c55e;
+    }
+
+    .offline {
+      color: #ef4444;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>IoT Gauge Control</h2>
+
+    <div id="gauge" class="gauge">0%</div>
+
+    <input
+      type="range"
+      min="0"
+      max="100"
+      value="0"
+      oninput="updateGauge(this.value)"
+    />
+
+    <div id="status" class="status offline">
+      ● Device OFFLINE
+    </div>
+  </div>
+
+  <script>
+    const TOKEN = "YOUR PRIVATE TOKEN";
+    const BASE_URL = "https://blynk.cloud/external/api";
+
+    function updateGauge(value) {
+      const gauge = document.getElementById("gauge");
+      const status = document.getElementById("status");
+
+      gauge.textContent = value + "%";
+
+      // Color change
+      gauge.style.color =
+        value > 50 ? "#22c55e" : value > 20 ? "#facc15" : "#ef4444";
+
+      // Send value to Blynk (V2)
+      fetch(`${BASE_URL}/update?token=${TOKEN}&V3=${value}`)
+        .then(() => {
+          status.textContent = "● Device ONLINE";
+          status.className = "status online";
+        })
+        .catch(() => {
+          status.textContent = "● Device OFFLINE";
+          status.className = "status offline";
+        });
+    }
+  </script>
+
+</body>
+</html>
